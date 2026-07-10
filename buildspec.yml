@@ -1,15 +1,7 @@
-
 version: 0.2
 
 phases:
-
   build:
-
     commands:
-
       - echo "Deploying CloudFormation"
-
-      - aws cloudformation deploy \
-          --template-file template.yaml \
-          --stack-name demo-stack \
-          --capabilities CAPABILITY_IAM
+      - aws cloudformation deploy --template-file template.yaml --stack-name demo-stack --capabilities CAPABILITY_IAM
