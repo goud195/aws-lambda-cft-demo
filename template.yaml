@@ -1,1 +1,51 @@
 
+AWSTemplateFormatVersion: '2010-09-09'
+
+Resources:
+
+  MyBucket:
+
+    Type: AWS::S3::Bucket
+
+
+  LambdaRole:
+
+    Type: AWS::IAM::Role
+
+    Properties:
+
+      AssumeRolePolicyDocument:
+
+        Statement:
+
+        - Effect: Allow
+
+          Principal:
+
+            Service:
+              - lambda.amazonaws.com
+
+          Action:
+              - sts:AssumeRole
+
+
+  MyLambda:
+
+    Type: AWS::Lambda::Function
+
+    Properties:
+
+      FunctionName: demo-lambda
+
+      Runtime: python3.12
+
+      Handler: app.lambda_handler
+
+      Role: !GetAtt LambdaRole.Arn
+
+      Code:
+
+        ZipFile: |
+
+          def lambda_handler(event,context):
+              return "hello"
