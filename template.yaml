@@ -1,51 +1,73 @@
-
 AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Create S3 Bucket and Lambda using CloudFormation
 
 Resources:
 
-  MyBucket:
+  # -----------------------
+  # S3 Bucket
+  # -----------------------
 
+  MyS3Bucket:
     Type: AWS::S3::Bucket
-
-
-  LambdaRole:
-
-    Type: AWS::IAM::Role
-
     Properties:
+      BucketName: my-codepipeline-demo-bucket-12345
+
+
+  # -----------------------
+  # Lambda IAM Role
+  # -----------------------
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: demo-lambda-execution-role
 
       AssumeRolePolicyDocument:
-
+        Version: "2012-10-17"
         Statement:
 
-        - Effect: Allow
-
-          Principal:
-
-            Service:
-              - lambda.amazonaws.com
-
-          Action:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
               - sts:AssumeRole
 
 
-  MyLambda:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
+
+  # -----------------------
+  # Lambda Function
+  # -----------------------
+
+  MyLambdaFunction:
     Type: AWS::Lambda::Function
-
     Properties:
 
-      FunctionName: demo-lambda
+      FunctionName: demo-lambda-function
 
       Runtime: python3.12
 
-      Handler: app.lambda_handler
+      Handler: index.lambda_handler
 
-      Role: !GetAtt LambdaRole.Arn
+      Role: !GetAtt LambdaExecutionRole.Arn
 
       Code:
-
         ZipFile: |
+          def lambda_handler(event, context):
+              return {
+                  "statusCode": 200,
+                  "body": "Hello from AWS CodePipeline + CodeBuild + CloudFormation"
+              }
 
-          def lambda_handler(event,context):
-              return "hello"
+Outputs:
+
+  BucketName:
+    Value: !Ref MyS3Bucket
+
+
+  LambdaName:
+    Value: !Ref MyLambdaFunction
